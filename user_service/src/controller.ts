@@ -1,3 +1,4 @@
+import type { AuthRequest } from "./middleware.js";
 import { User } from "./model.js";
 import TryCatch from "./TryCatch.js";
 import bcrypt from "bcrypt";
@@ -47,4 +48,9 @@ export const loginUser = TryCatch(async (req , res) => {
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: "7d" });
 
     return res.status(200).json({ user, token });
+})
+
+export const myProfile = TryCatch(async (req : AuthRequest , res) => {
+    const user = req.user;
+    return res.status(200).json({ user });
 })

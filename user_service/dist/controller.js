@@ -34,3 +34,7 @@ export const loginUser = TryCatch(async (req, res) => {
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: "7d" });
     return res.status(200).json({ user, token });
 });
+export const myProfile = TryCatch(async (req, res) => {
+    const user = req.user;
+    return res.status(200).json({ user });
+});
