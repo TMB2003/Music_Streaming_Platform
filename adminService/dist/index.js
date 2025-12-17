@@ -1,14 +1,12 @@
 import express from "express";
 import dotenv from "dotenv";
 import { sql_db } from "./config/db.js";
-
 dotenv.config();
 const app = express();
 const PORT = process.env["PORT"];
-
 async function initDB() {
     try {
-        await sql_db`
+        await sql_db `
             CREATE TABLE IF NOT EXISTS Albums(
                 id SERIAL PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
@@ -17,9 +15,7 @@ async function initDB() {
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `;
-
-
-        await sql_db`
+        await sql_db `
             CREATE TABLE IF NOT EXISTS Songs(
                 id SERIAL PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
@@ -30,13 +26,12 @@ async function initDB() {
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `;
-
         console.log("Database initialized successfully");
-    } catch (error) {
+    }
+    catch (error) {
         console.log("Database initialization failed", error);
     }
 }
-
 initDB().then(() => {
     app.listen(PORT, () => {
         console.log(`Admin Service is running on port ${PORT}`);
