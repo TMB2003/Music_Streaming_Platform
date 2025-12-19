@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { sql_db } from "./config/db.js";
+import adminroute from "./route.js";
 dotenv.config();
 const app = express();
 const PORT = process.env["PORT"];
@@ -32,6 +33,8 @@ async function initDB() {
         console.log("Database initialization failed", error);
     }
 }
+app.use(express.json());
+app.use('/api/v1/', adminroute);
 initDB().then(() => {
     app.listen(PORT, () => {
         console.log(`Admin Service is running on port ${PORT}`);
