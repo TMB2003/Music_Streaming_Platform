@@ -1,8 +1,8 @@
 import express from "express";
-import { isAuth } from "./middleware.js";
+import uploadFile, { isAuth } from "./middleware.js";
 import { addAlbum } from "./controller.js";
 const router = express.Router();
 
-router.post("/album/new", isAuth, addAlbum);
+router.post("/album/new", isAuth, uploadFile, addAlbum);
 
 export default router;

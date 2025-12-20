@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { sql_db } from "./config/db.js";
-import adminroute from "./route.js";
+import adminroute from "./router.js";
 import cloudinary from "cloudinary";
 
 dotenv.config();
