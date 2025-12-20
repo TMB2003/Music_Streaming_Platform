@@ -25,7 +25,7 @@ export const addAlbum = TryCatch(async (req: authenticatedRequest, res) => {
 
     const fileBuffer = getBuffer(file);
     if(!fileBuffer || !fileBuffer.content){
-        return res.status(400).json({message: "Bad Request"});
+        return res.status(400).json({message: "Failed to generate a file buffer"});
     }
 
     try {
@@ -49,6 +49,98 @@ export const addAlbum = TryCatch(async (req: authenticatedRequest, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to add album. Please try again later."
+        });
+    }
+});
+
+export const addSong = TryCatch(async (req: authenticatedRequest, res) => {
+    if(!req.user || req.user.role !== "admin"){
+        return res.status(401).json({message: "Unauthorized"});
+    }
+
+    const {title, description, album_id} = req.body;
+
+    const isAlbum = await sql_db`SELECT * FROM Albums WHERE id = ${album_id}`;
+    if(isAlbum.length === 0){
+        return res.status(400).json({message: "Album not found"});
+    }
+
+    const file = req.file;
+    if(!file){
+        return res.status(400).json({message: "No Files Uploaded"});
+    }
+
+    const fileBuffer = getBuffer(file);
+    if(!fileBuffer || !fileBuffer.content){
+        return res.status(400).json({message: "Failed to generate file buffer"});
+    }
+
+    try {
+        const image = await cloudinary.v2.uploader.upload(fileBuffer.content, {
+            folder: "songs",
+            resource_type: "video"
+        });
+
+        const result = await sql_db`
+            INSERT INTO Songs (title, description, audio, album_id)
+            VALUES (${title}, ${description}, ${image.secure_url}, ${album_id})
+            RETURNING *
+        `;
+
+        return res.status(201).json({
+            success: true,
+            message: "Song added successfully",
+            song: result[0],
+        });
+    } catch (error) {
+        console.error('Error in addSong:', error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to add song. Please try again later."
+        });
+    }
+});
+
+export const thumbnailUpload = TryCatch(async (req: authenticatedRequest, res) => {
+    if(!req.user || req.user.role !== "admin"){
+        return res.status(401).json({message: "Unauthorized"});
+    }
+
+    const song = await sql_db`SELECT * FROM Songs WHERE id = ${req.params['id']}`;
+    if(song.length === 0){
+        return res.status(400).json({message: "Song not found"});
+    }
+
+    const file = req.file;
+    if(!file){
+        return res.status(400).json({message: "No Files Uploaded"});
+    }
+
+    const fileBuffer = getBuffer(file);
+    if(!fileBuffer || !fileBuffer.content){
+        return res.status(400).json({message: "Failed to generate file buffer"});
+    }
+
+    try {
+        const image = await cloudinary.v2.uploader.upload(fileBuffer.content);
+
+        const result = await sql_db`
+            UPDATE Songs
+            SET thumbnail = ${image.secure_url}
+            WHERE id = ${req.params['id']}
+            RETURNING *
+        `;
+
+        return res.status(201).json({
+            success: true,
+            message: "Song thumbnail updated successfully",
+            song: result[0],
+        });
+    } catch (error) {
+        console.error('Error in thumbnailUpload:', error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to add song. Please try again later."
         });
     }
 });

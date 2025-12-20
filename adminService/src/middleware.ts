@@ -25,17 +25,22 @@ export const isAuth = async (req: AuthRequest, res: Response, next: NextFunction
             return;
         }
 
-        const data = await axios.get(process.env["USER_SERVICE_URL"] + "/api/v1/auth/verify", {
+        const response = await axios.get(process.env["USER_SERVICE_URL"] + "/api/v1/user/profile", {
             headers: {
                 token: token
             }
         });
+        
+        if (!response.data || !response.data.user) {
+            throw new Error("Invalid user data");
+        }
 
-        req.user = data.data;
+        // Attach user data to the request object
+        req.user = response.data.user;
         next();
     } catch (error) {
+        console.error("Authentication error:", error);
         res.status(403).json({message: "Please Log In"});
-
     }
 }
 
