@@ -29,7 +29,7 @@ async function initDB() {
                 description VARCHAR(255) NOT NULL,
                 thumbnail VARCHAR(255),
                 audio VARCHAR(255) NOT NULL,
-                album_id INTEGER REFERENCES Albums(id) ON DELETE SET NULL,
+                album_id INTEGER REFERENCES Albums(id) NOT NULL,
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `;

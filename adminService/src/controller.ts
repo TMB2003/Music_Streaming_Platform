@@ -53,6 +53,32 @@ export const addAlbum = TryCatch(async (req: authenticatedRequest, res) => {
     }
 });
 
+
+export const deleteAlbum = TryCatch(async (req: authenticatedRequest, res) => {
+    if(!req.user || req.user.role !== "admin"){
+        return res.status(401).json({message: "Unauthorized"});
+    }
+
+    const id = req.params['id'];
+    const album = await sql_db`SELECT * FROM Albums WHERE id = ${id}`;
+
+    if(album.length === 0){
+        return res.status(400).json({message: "Album not found"});
+    }
+    
+    await sql_db`
+        DELETE FROM Songs
+        WHERE album_id = ${id}
+    `;
+    
+    await sql_db`
+        DELETE FROM Albums
+        WHERE id = ${id}
+    `;
+
+    return res.status(200).json({message: "Album deleted successfully"});
+});
+
 export const addSong = TryCatch(async (req: authenticatedRequest, res) => {
     if(!req.user || req.user.role !== "admin"){
         return res.status(401).json({message: "Unauthorized"});
@@ -145,27 +171,19 @@ export const thumbnailUpload = TryCatch(async (req: authenticatedRequest, res) =
     }
 });
 
-export const deleteAlbum = TryCatch(async (req: authenticatedRequest, res) => {
+export const deleteSong = TryCatch(async (req: authenticatedRequest, res) => {
     if(!req.user || req.user.role !== "admin"){
         return res.status(401).json({message: "Unauthorized"});
     }
 
     const id = req.params['id'];
-    const album = await sql_db`SELECT * FROM Albums WHERE id = ${id}`;
 
-    if(album.length === 0){
-        return res.status(400).json({message: "Album not found"});
-    }
-    
-    await sql_db`
-        DELETE FROM Albums
-        WHERE id = ${id}
-    `;
+    const song = await sql_db`SELECT * FROM Songs WHERE id = ${id}`;
+    if(song.length === 0){
+        return res.status(400).json({message: "Song not found"});
+    }   
 
-    await sql_db`
-        DELETE FROM Songs
-        WHERE album_id = ${id}
-    `;
+    await sql_db`DELETE FROM Songs WHERE id = ${id}`;
 
-    return res.status(200).json({message: "Album deleted successfully"});
+    return res.status(200).json({message: "Song deleted successfully"});
 });

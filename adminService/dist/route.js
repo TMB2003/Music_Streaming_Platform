@@ -1,9 +1,10 @@
 import express from "express";
 import uploadFile, { isAuth } from "./middleware.js";
-import { addAlbum, addSong, deleteAlbum, thumbnailUpload } from "./controller.js";
+import { addAlbum, addSong, deleteAlbum, deleteSong, thumbnailUpload } from "./controller.js";
 const router = express.Router();
 router.post("/album/new", isAuth, uploadFile, addAlbum);
+router.delete("/album/:id", isAuth, deleteAlbum);
 router.post("/song/new", isAuth, uploadFile, addSong);
 router.post("/song/:id", isAuth, uploadFile, thumbnailUpload);
-router.delete("/album/delete/:id", isAuth, deleteAlbum);
+router.delete("/song/:id", isAuth, deleteSong);
 export default router;
