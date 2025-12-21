@@ -9,6 +9,7 @@
     "dev": "concurrently \"tsc -w\" \"nodemon dist/index.js\""
   },
   "keywords": [],
+  "type": "module",
   "author": "",
   "license": "ISC",
   "description": "",
