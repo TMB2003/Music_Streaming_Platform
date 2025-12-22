@@ -1,19 +1,9 @@
-import type { Request } from "express";
 import { sql_db } from "./config/db.js";
 import TryCatch from "./TryCatch.js";
 import { redisConnect } from "./config/redisDB.js";
 
-interface authenticatedRequest extends Request {
-    user?:{
-        _id: string,
-        role: string
-    }
-}
 
-export const getAllAlbums = TryCatch(async (req: authenticatedRequest, res) => {
-    if(!req.user || req.user.role !== "admin"){
-        return res.status(401).json({message: "Unauthorized"});
-    }
+export const getAllAlbums = TryCatch(async (_req, res) => {
     let albums;
     if(redisConnect.isReady){
         albums = await redisConnect.get("albums");
@@ -30,10 +20,7 @@ export const getAllAlbums = TryCatch(async (req: authenticatedRequest, res) => {
     return res.status(200).json(JSON.parse(albums));
 });
 
-export const getAllSongs = TryCatch(async (req: authenticatedRequest, res) => {
-    if(!req.user || req.user.role !== "admin"){
-        return res.status(401).json({message: "Unauthorized"});
-    }
+export const getAllSongs = TryCatch(async (_req, res) => {
     let songs;
     if(redisConnect.isReady){
         songs = await redisConnect.get("songs");
@@ -49,10 +36,7 @@ export const getAllSongs = TryCatch(async (req: authenticatedRequest, res) => {
     return res.status(200).json(JSON.parse(songs));
 });
 
-export const getSongsOfAlbum = TryCatch(async(req: authenticatedRequest, res) => {
-    if(!req.user || req.user.role !== "admin"){
-        return res.status(401).json({message: "Unauthorized"});
-    }
+export const getSongsOfAlbum = TryCatch(async(req, res) => {
     const id = req.params['id'];
     let album;
     if(redisConnect.isReady){
@@ -74,10 +58,7 @@ export const getSongsOfAlbum = TryCatch(async(req: authenticatedRequest, res) =>
     return res.status(200).json(album);
 });
 
-export const getSong = TryCatch(async(req: authenticatedRequest, res) => {
-    if(!req.user || req.user.role !== "admin"){
-        return res.status(401).json({message: "Unauthorized"});
-    }
+export const getSong = TryCatch(async(req, res) => {
     const id = req.params['id'];
     const song = await sql_db`SELECT * FROM songs WHERE id = ${id}`;
     if(song.length === 0) {
