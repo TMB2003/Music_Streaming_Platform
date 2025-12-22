@@ -3,7 +3,7 @@ import TryCatch from "./TryCatch.js";
 import { getBuffer } from "./config/dataUri.js";
 import cloudinary from "cloudinary";
 import { sql_db } from "./config/db.js";
-
+import { redisConnect } from "./config/redisDB.js";
 interface authenticatedRequest extends Request {
     user?:{
         _id: string,
@@ -28,29 +28,25 @@ export const addAlbum = TryCatch(async (req: authenticatedRequest, res) => {
         return res.status(400).json({message: "Failed to generate a file buffer"});
     }
 
-    try {
-        const image = await cloudinary.v2.uploader.upload(fileBuffer.content, {
-            folder: "albums"
-        });
+    const image = await cloudinary.v2.uploader.upload(fileBuffer.content, {
+        folder: "albums"
+    });
 
-        const result = await sql_db`
-            INSERT INTO Albums (title, description, thumbnail)
-            VALUES (${title}, ${description}, ${image.secure_url})
-            RETURNING *
-        `;
+    const result = await sql_db`
+        INSERT INTO Albums (title, description, thumbnail)
+        VALUES (${title}, ${description}, ${image.secure_url})
+        RETURNING *
+    `;
 
-        return res.status(201).json({
-            success: true,
-            message: "Album added successfully",
-            album: result[0],
-        });
-    } catch (error) {
-        console.error('Error in addAlbum:', error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to add album. Please try again later."
-        });
+    if(redisConnect.isReady){
+        await redisConnect.del(`albums`);
     }
+
+    return res.status(201).json({
+        success: true,
+        message: "Album added successfully",
+        album: result[0],
+    });
 });
 
 
@@ -101,30 +97,29 @@ export const addSong = TryCatch(async (req: authenticatedRequest, res) => {
         return res.status(400).json({message: "Failed to generate file buffer"});
     }
 
-    try {
-        const image = await cloudinary.v2.uploader.upload(fileBuffer.content, {
-            folder: "songs",
-            resource_type: "video"
-        });
+    const image = await cloudinary.v2.uploader.upload(fileBuffer.content, {
+        folder: "songs",
+        resource_type: "video"
+    });
 
-        const result = await sql_db`
-            INSERT INTO Songs (title, description, audio, album_id)
-            VALUES (${title}, ${description}, ${image.secure_url}, ${album_id})
-            RETURNING *
-        `;
+    const result = await sql_db`
+        INSERT INTO Songs (title, description, audio, album_id)
+        VALUES (${title}, ${description}, ${image.secure_url}, ${album_id})
+        RETURNING *
+    `;
 
-        return res.status(201).json({
-            success: true,
-            message: "Song added successfully",
-            song: result[0],
-        });
-    } catch (error) {
-        console.error('Error in addSong:', error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to add song. Please try again later."
-        });
+    if(redisConnect.isReady){
+        await redisConnect.del(`songs`);
     }
+    if(redisConnect.isReady){
+        await redisConnect.del(`album:${album_id}`);
+    }
+
+    return res.status(201).json({
+        success: true,
+        message: "Song added successfully",
+        song: result[0],
+    });
 });
 
 export const thumbnailUpload = TryCatch(async (req: authenticatedRequest, res) => {
@@ -147,28 +142,29 @@ export const thumbnailUpload = TryCatch(async (req: authenticatedRequest, res) =
         return res.status(400).json({message: "Failed to generate file buffer"});
     }
 
-    try {
-        const image = await cloudinary.v2.uploader.upload(fileBuffer.content);
+    const image = await cloudinary.v2.uploader.upload(fileBuffer.content);
 
-        const result = await sql_db`
-            UPDATE Songs
-            SET thumbnail = ${image.secure_url}
-            WHERE id = ${req.params['id']}
-            RETURNING *
-        `;
+    const result = await sql_db`
+        UPDATE Songs
+        SET thumbnail = ${image.secure_url}
+        WHERE id = ${req.params['id']}
+        RETURNING *
+    `;
 
-        return res.status(201).json({
-            success: true,
-            message: "Song thumbnail updated successfully",
-            song: result[0],
-        });
-    } catch (error) {
-        console.error('Error in thumbnailUpload:', error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to add song. Please try again later."
-        });
+    const album_id = await sql_db`SELECT album_id FROM Songs WHERE id = ${req.params['id']}`;
+
+    if(redisConnect.isReady){
+        await redisConnect.del(`songs`);
     }
+    if(redisConnect.isReady){
+        await redisConnect.del(`album:${album_id}`);
+    }
+
+    return res.status(201).json({
+        success: true,
+        message: "Song thumbnail updated successfully",
+        song: result[0],
+    });
 });
 
 export const deleteSong = TryCatch(async (req: authenticatedRequest, res) => {

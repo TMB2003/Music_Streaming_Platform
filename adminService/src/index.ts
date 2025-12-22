@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import adminroute from "./route.js";
 import cloudinary from "cloudinary";
 import { initDB } from "./config/initDB.js";
+import { redisDB } from "./config/redisDB.js";
+import cors from "cors";
 
 dotenv.config();
 
@@ -15,11 +17,14 @@ cloudinary.v2.config({
 const app = express();
 const PORT = process.env["PORT"];
 
+app.use(cors());
 app.use(express.json());
 app.use('/api/v1/', adminroute);
 
 initDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Admin Service is running on port ${PORT}`);
+    redisDB().then(() => {
+        app.listen(PORT, () => {
+            console.log(`Admin Service is running on port ${PORT}`);
+        });
     });
 });

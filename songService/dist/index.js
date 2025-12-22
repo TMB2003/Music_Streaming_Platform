@@ -3,9 +3,11 @@ import dotenv from "dotenv";
 dotenv.config();
 import songRoutes from "./route.js";
 import { redisDB } from "./config/redisDB.js";
+import cors from "cors";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 app.use("/api/v1", songRoutes);
 const port = process.env['PORT'];
 app.listen(port, () => {
