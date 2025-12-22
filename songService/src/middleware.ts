@@ -19,7 +19,7 @@ interface AuthRequest extends Request {
 export const isAuth = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
         const token = req.headers['token'] as string;
-
+        
         if(!token){
             res.status(403).json({message: "Please Log In"});
             return;
