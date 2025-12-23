@@ -143,6 +143,6 @@ Contributions are what make the open-source community such an amazing place to l
 
 ## 📧 Contact
 
-Your Name - [Taha Balapurwala](https://twitter.com/your_username](https://in.linkedin.com/in/taha-balapurwala ) - contact.tahab@gmail.com
+Your Name - [Taha Balapurwala](https://in.linkedin.com/in/taha-balapurwala) - contact.tahab@gmail.com
 
 Project Link: [https://github.com/TMB2003/Music_Streaming_Platform](https://github.com/TMB2003/Music_Streaming_Platform)
