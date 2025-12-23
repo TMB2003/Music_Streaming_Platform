@@ -127,6 +127,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [TypeScript](https://www.typescriptlang.org/)
 - [Node.js](https://nodejs.org/)
 - [Express](https://expressjs.com/)
+- [MongoDB](https://www.mongodb.com/)
 - [PostgreSQL](https://www.postgresql.org/)
 - [TailwindCSS](https://tailwindcss.com/)
 
@@ -142,6 +143,6 @@ Contributions are what make the open-source community such an amazing place to l
 
 ## 📧 Contact
 
-Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
+Your Name - [Taha Balapurwala](https://twitter.com/your_username](https://in.linkedin.com/in/taha-balapurwala ) - contact.tahab@gmail.com
 
-Project Link: [https://github.com/yourusername/Music_Streaming_Platform](https://github.com/yourusername/Music_Streaming_Platform)
+Project Link: [https://github.com/TMB2003/Music_Streaming_Platform](https://github.com/TMB2003/Music_Streaming_Platform)
