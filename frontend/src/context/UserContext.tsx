@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
-const server = "http://13.235.70.183:5000";
+const server = import.meta.env.VITE_API_BASE_URL;
 
 export interface User {
   _id: string;
@@ -102,7 +102,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   async function fetchUser() {
     try {
-      const { data } = await axios.get(`${server}/api/v1/user/me`, {
+      const { data } = await axios.get(`${server}/api/v1/user/profile`, {
         headers: {
           token: localStorage.getItem("token"),
         },

@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 
-const server = "http://13.235.70.183:8000";
+const server = import.meta.env.VITE_SONG_API_URL;
 
 export interface Song {
   id: string;
@@ -61,7 +61,7 @@ export const SongProvider: React.FC<SongProviderProps> = ({ children }) => {
   const fetchSongs = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get<Song[]>(`${server}/api/v1/song/all`);
+      const { data } = await axios.get<Song[]>(`${server}/api/v1/songs`);
       setSongs(data);
       if (data.length > 0) setSelectedSong(data[0].id.toString());
       setIsPlaying(false);
@@ -89,7 +89,7 @@ export const SongProvider: React.FC<SongProviderProps> = ({ children }) => {
   const fetchAlbums = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get<Album[]>(`${server}/api/v1/album/all`);
+      const { data } = await axios.get<Album[]>(`${server}/api/v1/albums`);
       setAlbums(data);
     } catch (error) {
       console.log(error);
